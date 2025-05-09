@@ -1,8 +1,4 @@
-import MainOptions from "./components/mainOption.jsx";
-import MessageFormat from "./components/messageFormat.jsx";
 import "./index.css";
-import MainOptionStore from "./state/mainOption.jsx";
-import MessageFormatStore from "./state/messageFormat.jsx";
 import { useEffect, useState } from "react";
 import {
   decode_pseudobinary,
@@ -11,13 +7,21 @@ import {
 } from "./utils/decodeFuncs.js";
 
 function App() {
-  let mainOptionStore = MainOptionStore();
-  let messageFormatStore = MessageFormatStore();
   useEffect(() => decode(), []);
 
+  const [mainOption, setMainOption] = useState("custom");
+  const handleMainOptionChange = (e) => {
+    setMainOption(e.target.value);
+  };
+
+  const [messageFormat, setMessageFormat] = useState("pb_positive");
+  const handleMessageFormatChange = (e) => {
+    setMessageFormat(e.target.value);
+  };
+
   useEffect(() => {
-    const setFormData = () => {
-      switch (mainOptionStore.mainOption) {
+    const setFormOptions = () => {
+      switch (mainOption) {
         case "sutron_voltage":
           setStart(messageLength - 1);
           setWidth(1);
@@ -35,8 +39,8 @@ function App() {
           setAdder(0.311);
       }
     };
-    setFormData();
-  }, [mainOptionStore.mainOption]);
+    setFormOptions();
+  }, [mainOption]);
 
   let defaultMessage = "`BST@Ff@Ffj";
   const [message, setMessage] = useState(defaultMessage);
@@ -185,7 +189,7 @@ function App() {
     setSubMessage(formattedSubMessage);
 
     let decodedValue;
-    switch (messageFormatStore.messageFormat) {
+    switch (messageFormat) {
       case "pb_positive":
         decodedValue = decode_pseudobinary(newSubMessage);
         break;
@@ -265,8 +269,8 @@ function App() {
           </div>
         </div>
 
-        <div className=" flex mb-1 justify-between">
-          <div className=" flex flex-col w-1/2 mr-2">
+        <div className="flex mb-1 justify-between">
+          <div className="flex flex-col w-1/2 mr-2">
             <label htmlFor="div">Divider</label>
             <input
               className={"w-full"}
@@ -316,8 +320,31 @@ function App() {
         </div>
         <hr className={"border-gray-600"} />
         <div className={"flex items-center"}>
-          <MainOptions />
-          <MessageFormat />
+          <div className={"flex flex-col w-1/2 mr-2"}>
+            <label htmlFor="main-option">Type of Message</label>
+            <select
+              name="main-option"
+              id="main-option"
+              onChange={handleMainOptionChange}
+            >
+              <option value="custom">Custom</option>
+              <option value="sutron_voltage">Sutron Voltage</option>
+              <option value="da_voltage">DA Voltage</option>
+            </select>
+          </div>
+
+          <div className={"flex flex-col w-1/2 ml-2"}>
+            <label htmlFor="message-format">Message Format</label>
+            <select
+              name="message-format"
+              id="message-format"
+              onChange={handleMessageFormatChange}
+            >
+              <option value="pb_positive">Non-negative</option>
+              <option value="pb_signed">Signed</option>
+              <option value="pb_b">Pseudo-binary B</option>
+            </select>
+          </div>
         </div>
         <button className={"my-3 w-full"} type="submit">
           Decode
