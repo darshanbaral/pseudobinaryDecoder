@@ -1,47 +1,63 @@
-@tailwind base;
-@tailwind components;
+@import "tailwindcss";
+
 @tailwind utilities;
 
-body {
-  @apply bg-gray-900 text-slate-100 max-w-screen-sm mx-auto px-4;
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-700, currentcolor);
+  }
 }
 
-h1 {
-  @apply text-4xl font-bold leading-tight mt-1 mb-3;
-}
+@layer utilities {
+  body {
+    @apply bg-gray-900 text-slate-100 max-w-(--breakpoint-sm) mx-auto px-4;
+  }
 
-h2 {
-  @apply text-2xl font-bold leading-tight mt-1 mb-3;
-}
+  h1 {
+    @apply text-3xl font-bold leading-tight mb-3;
+  }
 
-p {
-  @apply mb-3;
-}
+  h2 {
+    @apply text-2xl font-bold leading-tight mb-3;
+  }
 
-code {
-  @apply text-green-300;
-}
+  h3 {
+    @apply font-bold leading-tight mb-3;
+  }
 
-hr {
-  @apply my-2;
-}
+  p {
+    @apply mb-3;
+  }
 
-button {
-  @apply bg-blue-500 text-white leading-tight p-2 rounded hover:bg-blue-700;
-}
+  code {
+    @apply text-green-300;
+  }
 
-button.active {
-  @apply bg-blue-900;
-}
+  hr {
+    @apply my-2;
+  }
 
-label {
-  @apply mb-1;
-}
+  button {
+    @apply bg-blue-500 text-white leading-tight p-2 rounded-sm hover:bg-blue-700;
+  }
 
-input {
-  @apply bg-gray-800 text-gray-200 p-1 rounded mb-2 border border-transparent border-2 focus:border-blue-300 invalid:border-red-500;
-}
+  button.active {
+    @apply bg-blue-900;
+  }
 
-select {
-  @apply bg-gray-700 text-gray-200 p-1 rounded;
+  label {
+    @apply mb-1;
+  }
+
+  input {
+    @apply bg-gray-800 text-gray-200 p-1 rounded-sm mb-2 border border-transparent border-2 focus:border-blue-300 invalid:border-red-500;
+  }
+
+  select {
+    @apply bg-gray-700 text-gray-200 p-1 rounded-sm;
+  }
 }

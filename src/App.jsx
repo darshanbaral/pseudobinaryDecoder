@@ -222,8 +222,9 @@ function App() {
         <div>
           <div className="flex flex-col w-sm-input">
             <label htmlFor="e_msg">Encoded Message</label>
-            <input
-              type="text"
+            <textarea
+              className={"border rounded bg-gray-800 p-1"}
+              rows="5"
               id="e_msg"
               value={message}
               onChange={handleMessageChange}
@@ -353,17 +354,22 @@ function App() {
 
       <section
         id="results"
-        className={"bg-gray-800 p-2 rounded mb-2 border border-gray-400"}
+        className={"bg-gray-800 p-2 rounded-sm mb-2 border"}
       >
         <h2>Results</h2>
         <p>
-          Raw Encoded Message: <code>{subMessage}</code>
+          <span className={"font-bold"}>Raw Encoded Message</span>:{" "}
+          <code>{subMessage}</code>
         </p>
+
         <p>
-          Decoded Data: <code>{decodedData}</code>
+          <span className={"font-bold"}>Decoded Data</span>:{" "}
+          <code>{decodedData}</code>
         </p>
+
         <p>
-          Processed Data: <code>{processedValue}</code>
+          <span className={"font-bold"}>Processed Data</span>:{" "}
+          <code>{processedValue}</code>
         </p>
       </section>
     </>
