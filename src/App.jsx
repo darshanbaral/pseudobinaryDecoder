@@ -6,154 +6,153 @@ import {
   decode_signed_pseudobinary,
 } from "./utils/decodeFuncs.js";
 
-function App() {
+const defaultConfig = {
+  message: "`BST@Ff@Ffj",
+  start: 4,
+  width: 3,
+  divider: 100,
+  multiplier: 1,
+  adder: 0,
+  nDigits: 2,
+  messageFormat: "pb_positive",
+  mainOption: "custom",
+};
+
+const presets = {
+  sutron_voltage: {
+    startOffset: -1,
+    width: 1,
+    divider: 1,
+    multiplier: 0.234,
+    adder: 10.6,
+  },
+  da_voltage: {
+    startOffset: -1,
+    width: 1,
+    divider: 1,
+    multiplier: 0.3124,
+    adder: 0.311,
+  },
+};
+
+export default function App() {
   useEffect(() => decode(), []);
 
-  const [mainOption, setMainOption] = useState("custom");
+  const [mainOption, setMainOption] = useState(defaultConfig.mainOption);
   const handleMainOptionChange = (e) => {
     setMainOption(e.target.value);
   };
 
-  const [messageFormat, setMessageFormat] = useState("pb_positive");
+  const [messageFormat, setMessageFormat] = useState(
+    defaultConfig.messageFormat
+  );
   const handleMessageFormatChange = (e) => {
     setMessageFormat(e.target.value);
   };
 
   useEffect(() => {
-    const setFormOptions = () => {
-      switch (mainOption) {
-        case "sutron_voltage":
-          setStart(messageLength - 1);
-          setWidth(1);
-          setEnd(messageLength);
-          setDivider(1);
-          setMultiplier(0.234);
-          setAdder(10.6);
-          break;
-        case "da_voltage":
-          setStart(messageLength - 1);
-          setWidth(1);
-          setEnd(messageLength);
-          setDivider(1);
-          setMultiplier(0.3124);
-          setAdder(0.311);
-      }
-    };
-    setFormOptions();
+    if (mainOption === "custom") return;
+
+    const preset = presets[mainOption];
+    const newStart = message.length + preset.startOffset;
+    setStart(newStart);
+    setWidth(preset.width);
+    setEnd(newStart + preset.width);
+    setDivider(preset.divider);
+    setMultiplier(preset.multiplier);
+    setAdder(preset.adder);
   }, [mainOption]);
 
-  let defaultMessage = "`BST@Ff@Ffj";
-  const [message, setMessage] = useState(defaultMessage);
+  const [message, setMessage] = useState(defaultConfig.message);
   const handleMessageChange = (e) => {
     let newMessage = e.target.value.replace(/ /g, "");
+    setMessage(newMessage);
+    setMessageLength(newMessage.length);
     if (newMessage === "") {
       e.target.setCustomValidity("Message cannot be empty");
     } else {
       e.target.setCustomValidity("");
     }
-    setMessage(newMessage);
-    setMessageLength(newMessage.length);
   };
 
-  let defaultStartIndex = 4;
-  const [start, setStart] = useState(defaultStartIndex);
+  const [start, setStart] = useState(defaultConfig.start);
   const handleStartChange = (e) => {
     let startIndex = e.target.value;
-    let formattedStartIndex = Number(startIndex);
-    if (width === "") {
-      setStart(formattedStartIndex);
-      return;
-    }
+    setStart(startIndex);
     if (startIndex === "" || width === "") {
-      setStart("");
-      setEnd("N/A");
       e.target.setCustomValidity("Start index of sub-message cannot be empty");
     } else {
-      setStart(formattedStartIndex);
-      setEnd(width + formattedStartIndex);
       e.target.setCustomValidity("");
     }
   };
 
-  let defaultWidth = 3;
-  const [width, setWidth] = useState(defaultWidth);
-  const [end, setEnd] = useState(defaultStartIndex + defaultWidth);
+  const [width, setWidth] = useState(defaultConfig.width);
+  const [end, setEnd] = useState(defaultConfig.start + defaultConfig.width);
   const handleWidthChange = (e) => {
     let widthValue = e.target.value;
-    let formattedWidth = Number(widthValue);
+    setWidth(widthValue);
     if (widthValue === "") {
-      setWidth("");
-      setEnd("N/A");
       e.target.setCustomValidity("Message width cannot be empty");
     } else {
-      setWidth(formattedWidth);
-      setEnd(formattedWidth + start);
       e.target.setCustomValidity("");
     }
   };
 
-  let defaultDivider = 100;
-  const [divider, setDivider] = useState(defaultDivider);
+  useEffect(() => {
+    if (width === "" || start === "") {
+      setEnd("N/A");
+    } else {
+      setEnd(Number(start) + Number(width));
+    }
+  }, [start, width]);
+
+  const [divider, setDivider] = useState(defaultConfig.divider);
   const handleDividerChange = (e) => {
     let dividerValue = e.target.value;
-    let formattedDividerValue = Number(dividerValue);
-
+    setDivider(dividerValue);
     if (dividerValue === "") {
-      setDivider("");
       e.target.setCustomValidity("Divider cannot be empty");
+    } else if (dividerValue === "0") {
+      e.target.setCustomValidity("Divider cannot be zero");
     } else {
-      setDivider(formattedDividerValue);
-      if (formattedDividerValue === 0) {
-        e.target.setCustomValidity("Divider cannot be zero");
-      } else {
-        e.target.setCustomValidity("");
-      }
+      e.target.setCustomValidity("");
     }
   };
 
-  let defaultMultiplier = 1;
-  const [multiplier, setMultiplier] = useState(defaultMultiplier);
+  const [multiplier, setMultiplier] = useState(defaultConfig.multiplier);
   const handleMultiplierChange = (e) => {
     let multiplierValue = e.target.value;
-    let formattedMultiplierValue = Number(multiplierValue);
+    setMultiplier(multiplierValue);
     if (multiplierValue === "") {
-      setMultiplier("");
       e.target.setCustomValidity("Multiplier cannot be empty");
     } else {
-      setMultiplier(formattedMultiplierValue);
       e.target.setCustomValidity("");
     }
   };
 
-  let defaultAdder = 0;
-  const [adder, setAdder] = useState(defaultAdder);
+  const [adder, setAdder] = useState(defaultConfig.adder);
   const handleAdderChange = (e) => {
     let adderValue = e.target.value;
-    let formattedAdderValue = Number(adderValue);
+    setAdder(adderValue);
     if (adderValue === "") {
-      setAdder("");
       e.target.setCustomValidity("Adder cannot be empty");
     } else {
-      setAdder(formattedAdderValue);
       e.target.setCustomValidity("");
     }
   };
 
-  let defaultNDigits = 2;
-  const [nDigits, setNDigits] = useState(defaultNDigits);
+  const [nDigits, setNDigits] = useState(defaultConfig.nDigits);
   const handleNDigitsChange = (e) => {
     let nDigitsValue = e.target.value;
-    let formattedNDigits = Number(nDigitsValue);
+    setNDigits(nDigitsValue);
     if (nDigitsValue === "") {
-      setNDigits("");
       e.target.setCustomValidity("Number of digits cannot be empty");
     } else {
-      setNDigits(formattedNDigits);
       e.target.setCustomValidity("");
     }
   };
 
-  let defaultSubMessage = defaultMessage.slice(start, end);
+  let defaultSubMessage = defaultConfig.message.slice(start, end);
   const [subMessage, setSubMessage] = useState(defaultSubMessage);
 
   const [messageLength, setMessageLength] = useState(message.length);
@@ -205,8 +204,9 @@ function App() {
   };
 
   const processData = (decodedValue) => {
-    let processedValue = (decodedValue * multiplier) / divider + adder;
-    return processedValue.toFixed(nDigits);
+    let processedValue =
+      (decodedValue * Number(multiplier)) / Number(divider) + Number(adder);
+    return processedValue.toFixed(Number(nDigits));
   };
 
   return (
@@ -220,11 +220,11 @@ function App() {
 
       <form onSubmit={handleSubmit} name="msg_data">
         <div>
-          <div className="flex flex-col w-sm-input">
+          <div className="flex flex-col w-sm-input mb-2">
             <label htmlFor="e_msg">Encoded Message</label>
             <textarea
               className={"border rounded bg-gray-800 p-1"}
-              rows="5"
+              rows="3"
               id="e_msg"
               value={message}
               onChange={handleMessageChange}
@@ -246,6 +246,7 @@ function App() {
               max={3}
             />
           </div>
+
           <div className="flex flex-col w-1/3 mx-2">
             <label htmlFor="msg_start">Start</label>
             <input
@@ -258,6 +259,7 @@ function App() {
               max={messageLength - width}
             />
           </div>
+
           <div className="flex flex-col w-1/3 ml-2">
             <label htmlFor="msg_end">End</label>
             <input
@@ -274,7 +276,7 @@ function App() {
           <div className="flex flex-col w-1/2 mr-2">
             <label htmlFor="div">Divider</label>
             <input
-              className={"w-full"}
+              className={"w-full no-spinner"}
               type="number"
               value={divider.toString()}
               step="any"
@@ -282,10 +284,11 @@ function App() {
               onChange={handleDividerChange}
             />
           </div>
-          <div className="flex flex-col w-1/2 ml-2">
+
+          <div className="flex flex-col w-1/2 mx-2">
             <label htmlFor="mul">Multiplier</label>
             <input
-              className={"w-full"}
+              className={"w-full no-spinner"}
               type="number"
               id="mul"
               value={multiplier.toString()}
@@ -293,13 +296,11 @@ function App() {
               onChange={handleMultiplierChange}
             />
           </div>
-        </div>
 
-        <div className="flex mb-1 justify-between">
-          <div className="flex flex-col w-1/2 mr-2">
+          <div className="flex flex-col w-1/2 mx-2">
             <label htmlFor="add">Adder</label>
             <input
-              className={"w-full"}
+              className={"w-full no-spinner"}
               type="number"
               value={adder.toString()}
               step="any"
@@ -307,6 +308,7 @@ function App() {
               onChange={handleAdderChange}
             />
           </div>
+
           <div className="flex flex-col w-1/2 ml-2">
             <label htmlFor="ndig">Digits</label>
             <input
@@ -375,5 +377,3 @@ function App() {
     </>
   );
 }
-
-export default App;
