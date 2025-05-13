@@ -101,6 +101,7 @@ export default function App() {
         break;
       case "Message":
         setMessage(value);
+        setMessageLength(value.length);
         break;
       case "Width":
         setWidth(value);
