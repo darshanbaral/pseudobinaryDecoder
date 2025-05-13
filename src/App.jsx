@@ -36,7 +36,7 @@ const presets = {
 };
 
 export default function App() {
-  useEffect(() => decode(), []);
+
 
   const [mainOption, setMainOption] = useState(defaultConfig.mainOption);
   const handleMainOptionChange = (e) => {
@@ -49,6 +49,22 @@ export default function App() {
   const handleMessageFormatChange = (e) => {
     setMessageFormat(e.target.value);
   };
+
+  const [message, setMessage] = useState(defaultConfig.message);
+  const [start, setStart] = useState(defaultConfig.start);
+  const [width, setWidth] = useState(defaultConfig.width);
+  const [end, setEnd] = useState(defaultConfig.start + defaultConfig.width);
+  const [divider, setDivider] = useState(defaultConfig.divider);
+  const [multiplier, setMultiplier] = useState(defaultConfig.multiplier);
+  const [adder, setAdder] = useState(defaultConfig.adder);
+  const [nDigits, setNDigits] = useState(defaultConfig.nDigits);
+  const [messageLength, setMessageLength] = useState(message.length);
+
+  let defaultSubMessage = defaultConfig.message.slice(start, end);
+  const [subMessage, setSubMessage] = useState(defaultSubMessage);
+
+  const [decodedData, setDecodedData] = useState(null);
+  const [processedValue, setProcessedValue] = useState(null);
 
   useEffect(() => {
     if (mainOption === "custom") return;
@@ -63,39 +79,46 @@ export default function App() {
     setAdder(preset.adder);
   }, [mainOption]);
 
-  const [message, setMessage] = useState(defaultConfig.message);
-  const handleMessageChange = (e) => {
-    let newMessage = e.target.value.replace(/ /g, "");
-    setMessage(newMessage);
-    setMessageLength(newMessage.length);
-    if (newMessage === "") {
-      e.target.setCustomValidity("Message cannot be empty");
-    } else {
-      e.target.setCustomValidity("");
+  useEffect(() => decode(), []);
+
+  const checkValidity = (name, value) => {
+    if (value === "") {
+      return `${name} cannot be empty`;
     }
+    return "";
   };
 
-  const [start, setStart] = useState(defaultConfig.start);
-  const handleStartChange = (e) => {
-    let startIndex = e.target.value;
-    setStart(startIndex);
-    if (startIndex === "" || width === "") {
-      e.target.setCustomValidity("Start index of sub-message cannot be empty");
-    } else {
-      e.target.setCustomValidity("");
-    }
-  };
+  const handleChange = (e, name) => {
+    let value = e.target.value;
 
-  const [width, setWidth] = useState(defaultConfig.width);
-  const [end, setEnd] = useState(defaultConfig.start + defaultConfig.width);
-  const handleWidthChange = (e) => {
-    let widthValue = e.target.value;
-    setWidth(widthValue);
-    if (widthValue === "") {
-      e.target.setCustomValidity("Message width cannot be empty");
-    } else {
-      e.target.setCustomValidity("");
+    switch (name) {
+      case "Divider":
+        setDivider(value);
+        if (value === "0") {
+          e.target.setCustomValidity("Divider cannot be zero");
+          return;
+        }
+        break;
+      case "Message":
+        setMessage(value);
+        break;
+      case "Width":
+        setWidth(value);
+        break;
+      case "Start":
+        setStart(value);
+        break;
+      case "Multiplier":
+        setMultiplier(value);
+        break;
+      case "Adder":
+        setAdder(value);
+        break;
+      case "Digits":
+        setNDigits(value);
+        break;
     }
+    e.target.setCustomValidity(checkValidity(name, value));
   };
 
   useEffect(() => {
@@ -105,60 +128,6 @@ export default function App() {
       setEnd(Number(start) + Number(width));
     }
   }, [start, width]);
-
-  const [divider, setDivider] = useState(defaultConfig.divider);
-  const handleDividerChange = (e) => {
-    let dividerValue = e.target.value;
-    setDivider(dividerValue);
-    if (dividerValue === "") {
-      e.target.setCustomValidity("Divider cannot be empty");
-    } else if (dividerValue === "0") {
-      e.target.setCustomValidity("Divider cannot be zero");
-    } else {
-      e.target.setCustomValidity("");
-    }
-  };
-
-  const [multiplier, setMultiplier] = useState(defaultConfig.multiplier);
-  const handleMultiplierChange = (e) => {
-    let multiplierValue = e.target.value;
-    setMultiplier(multiplierValue);
-    if (multiplierValue === "") {
-      e.target.setCustomValidity("Multiplier cannot be empty");
-    } else {
-      e.target.setCustomValidity("");
-    }
-  };
-
-  const [adder, setAdder] = useState(defaultConfig.adder);
-  const handleAdderChange = (e) => {
-    let adderValue = e.target.value;
-    setAdder(adderValue);
-    if (adderValue === "") {
-      e.target.setCustomValidity("Adder cannot be empty");
-    } else {
-      e.target.setCustomValidity("");
-    }
-  };
-
-  const [nDigits, setNDigits] = useState(defaultConfig.nDigits);
-  const handleNDigitsChange = (e) => {
-    let nDigitsValue = e.target.value;
-    setNDigits(nDigitsValue);
-    if (nDigitsValue === "") {
-      e.target.setCustomValidity("Number of digits cannot be empty");
-    } else {
-      e.target.setCustomValidity("");
-    }
-  };
-
-  let defaultSubMessage = defaultConfig.message.slice(start, end);
-  const [subMessage, setSubMessage] = useState(defaultSubMessage);
-
-  const [messageLength, setMessageLength] = useState(message.length);
-
-  const [decodedData, setDecodedData] = useState(null);
-  const [processedValue, setProcessedValue] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -227,7 +196,7 @@ export default function App() {
               rows="3"
               id="e_msg"
               value={message}
-              onChange={handleMessageChange}
+              onChange={(e) => handleChange(e, "Message")}
               autoComplete="off"
             />
           </div>
@@ -241,7 +210,7 @@ export default function App() {
               type="number"
               id="msg_width"
               value={width.toString()}
-              onChange={handleWidthChange}
+              onChange={(e) => handleChange(e, "Width")}
               min={1}
               max={3}
             />
@@ -254,7 +223,7 @@ export default function App() {
               type="number"
               id="msg_start"
               value={start.toString()}
-              onChange={handleStartChange}
+              onChange={(e) => handleChange(e, "Start")}
               min="0"
               max={messageLength - width}
             />
@@ -281,7 +250,7 @@ export default function App() {
               value={divider.toString()}
               step="any"
               id="div"
-              onChange={handleDividerChange}
+              onChange={(e) => handleChange(e, "Divider")}
             />
           </div>
 
@@ -293,7 +262,7 @@ export default function App() {
               id="mul"
               value={multiplier.toString()}
               step="any"
-              onChange={handleMultiplierChange}
+              onChange={(e) => handleChange(e, "Multiplier")}
             />
           </div>
 
@@ -305,7 +274,7 @@ export default function App() {
               value={adder.toString()}
               step="any"
               id="add"
-              onChange={handleAdderChange}
+              onChange={(e) => handleChange(e, "Adder")}
             />
           </div>
 
@@ -317,7 +286,7 @@ export default function App() {
               value={nDigits.toString()}
               id="ndig"
               min="0"
-              onChange={handleNDigitsChange}
+              onChange={(e) => handleChange(e, "Digits")}
             />
           </div>
         </div>
