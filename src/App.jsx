@@ -36,8 +36,6 @@ const presets = {
 };
 
 export default function App() {
-
-
   const [mainOption, setMainOption] = useState(defaultConfig.mainOption);
   const handleMainOptionChange = (e) => {
     setMainOption(e.target.value);
@@ -183,7 +181,9 @@ export default function App() {
     <>
       <h1>Pseudo-binary Decoder</h1>
       <p>
-        The index begins at <code>0</code>.
+        The index begins at <code>0</code>. Fork{" "}
+        <a target={"_blank"} href={"https://github.com/darshanbaral/pseudobinaryDecoder"}>here <sup>↗</sup></a>
+        .
       </p>
 
       <hr />
@@ -291,7 +291,7 @@ export default function App() {
             />
           </div>
         </div>
-        <hr className={"border-gray-600"} />
+
         <div className={"flex items-center"}>
           <div className={"flex flex-col w-1/2 mr-2"}>
             <label htmlFor="main-option">Type of Message</label>
